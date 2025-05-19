@@ -1,0 +1,128 @@
+<!-- Home Page -->
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Welcome to Event Management System</h1>
+    <p class="lead">Discover, book, and manage events with ease.</p>
+    <hr class="my-4">
+    <p>Find upcoming events in your area or create your own event.</p>
+    <a class="btn btn-primary btn-lg" href="/events" role="button">Browse Events</a>
+    <% if (!locals.user) { %>
+        <a class="btn btn-outline-primary btn-lg ms-2" href="/auth/register" role="button">Sign Up</a>
+    <% } else { %>
+        <a class="btn btn-outline-primary btn-lg ms-2" href="/events/new" role="button">Create Event</a>
+    <% } %>
+</div>
+
+<!-- Featured Events Section -->
+<section class="my-5">
+    <h2 class="mb-4">Featured Events</h2>
+    <div class="row" id="featured-events">
+        <!-- Events will be loaded dynamically -->
+        <div class="col-12 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="my-5">
+    <h2 class="mb-4">Browse by Category</h2>
+    <div class="row" id="categories">
+        <!-- Categories will be loaded dynamically -->
+        <div class="col-12 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Load featured events
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simulate loading featured events (in a real app, this would be an API call)
+        setTimeout(() => {
+            const featuredEvents = document.getElementById('featured-events');
+            featuredEvents.innerHTML = `
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Tech Conference 2025</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">June 15, 2025</h6>
+                            <p class="card-text">Join us for the biggest tech conference of the year featuring the latest innovations.</p>
+                            <a href="/events/1" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Summer Music Festival</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">July 10, 2025</h6>
+                            <p class="card-text">A weekend of amazing music performances under the summer sky.</p>
+                            <a href="/events/2" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Business Networking Event</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">August 5, 2025</h6>
+                            <p class="card-text">Connect with professionals and expand your business network.</p>
+                            <a href="/events/3" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }, 500);
+        
+        // Simulate loading categories
+        setTimeout(() => {
+            const categories = document.getElementById('categories');
+            categories.innerHTML = `
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="/events/search?category=1" class="text-decoration-none">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-music fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Music</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="/events/search?category=2" class="text-decoration-none">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-futbol fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Sports</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="/events/search?category=3" class="text-decoration-none">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-laptop-code fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Technology</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="/events/search?category=4" class="text-decoration-none">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-briefcase fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Business</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }, 700);
+    });
+</script>

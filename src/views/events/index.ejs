@@ -1,0 +1,77 @@
+<!-- Events List Page -->
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>All Events</h1>
+        <% if (locals.user) { %>
+            <a href="/events/new" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Event
+            </a>
+        <% } %>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form action="/events/search" method="GET" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="query" placeholder="Search events..." value="<%= locals.searchQuery || '' %>">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="row">
+        <% if (events && events.length > 0) { %>
+            <% events.forEach(event => { %>
+                <div class="col-md-4 mb-4">
+                    <div class="card event-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= event.title %></h5>
+                            <h6 class="card-subtitle mb-2 text-muted event-date">
+                                <i class="far fa-calendar-alt"></i> 
+                                <%= new Date(event.event_date).toLocaleDateString('en-US', { 
+                                    weekday: 'short', 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </h6>
+                            <p class="card-text event-location">
+                                <i class="fas fa-map-marker-alt"></i> <%= event.location %>
+                            </p>
+                            <p class="card-text">
+                                <%= event.description.length > 100 ? event.description.substring(0, 100) + '...' : event.description %>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="event-price">$<%= event.price.toFixed(2) %></span>
+                                <a href="/events/<%= event.event_id %>" class="btn btn-sm btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <small class="text-muted">
+                                Organized by <%= event.organizer_name %> | 
+                                <% if (event.capacity - (event.booked_tickets || 0) <= 0) { %>
+                                    <span class="text-danger">Sold Out</span>
+                                <% } else { %>
+                                    <span class="text-success"><%= event.capacity - (event.booked_tickets || 0) %> tickets left</span>
+                                <% } %>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No events found. <% if (locals.user) { %><a href="/events/new">Create one</a><% } %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>

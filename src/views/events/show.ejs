@@ -1,0 +1,214 @@
+<!-- Event Detail Page -->
+<div class="container">
+    <!-- Event Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><%= event.title %></h1>
+            <p class="text-muted">
+                <i class="far fa-calendar-alt"></i> 
+                <%= new Date(event.event_date).toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) %>
+                | <i class="fas fa-map-marker-alt"></i> <%= event.location %>
+            </p>
+            <p>
+                <% if (categories && categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <span class="badge bg-secondary me-1"><%= category.name %></span>
+                    <% }); %>
+                <% } %>
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <p class="h3 text-primary mb-2">$<%= event.price.toFixed(2) %></p>
+            <p class="mb-0">
+                <% if (availableTickets > 0) { %>
+                    <span class="text-success"><%= availableTickets %> tickets available</span>
+                <% } else { %>
+                    <span class="text-danger">Sold Out</span>
+                <% } %>
+            </p>
+        </div>
+    </div>
+
+    <!-- Event Content -->
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Event Description -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">About This Event</h5>
+                    <p class="card-text"><%= event.description %></p>
+                    <p class="text-muted">
+                        Organized by <%= event.organizer_name %>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Reviews</h5>
+                    <div>
+                        <% if (avgRating > 0) { %>
+                            <span class="rating">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <i class="<%= i <= Math.round(avgRating) ? 'fas' : 'far' %> fa-star"></i>
+                                <% } %>
+                            </span>
+                            <span class="ms-2"><%= avgRating.toFixed(1) %> (<%= reviews.length %>)</span>
+                        <% } else { %>
+                            <span>No reviews yet</span>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <% if (reviews && reviews.length > 0) { %>
+                        <% reviews.forEach(review => { %>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <strong><%= review.username %></strong>
+                                        <span class="text-muted ms-2">
+                                            <%= new Date(review.created_at).toLocaleDateString() %>
+                                        </span>
+                                    </div>
+                                    <div class="rating">
+                                        <% for (let i = 1; i <= 5; i++) { %>
+                                            <i class="<%= i <= review.rating ? 'fas' : 'far' %> fa-star"></i>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <p class="mb-0"><%= review.comment %></p>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No reviews yet. Be the first to review!</p>
+                    <% } %>
+
+                    <!-- Add Review Form -->
+                    <% if (locals.user && !userBooking) { %>
+                        <div class="alert alert-info">
+                            You need to book this event before you can leave a review.
+                        </div>
+                    <% } else if (locals.user) { %>
+                        <h6 class="mt-4">Add Your Review</h6>
+                        <form action="/events/<%= event.event_id %>/reviews" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                <div class="rating mb-2">
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <i class="rating-star far fa-star" data-value="<%= i %>"></i>
+                                    <% } %>
+                                </div>
+                                <input type="hidden" id="rating" name="rating" value="5" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Comment</label>
+                                <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Booking Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Book This Event</h5>
+                </div>
+                <div class="card-body">
+                    <% if (!locals.user) { %>
+                        <div class="alert alert-info">
+                            Please <a href="/auth/login">login</a> to book this event.
+                        </div>
+                    <% } else if (userBooking) { %>
+                        <div class="alert alert-success">
+                            <h6>You've booked this event!</h6>
+                            <p class="mb-1">Tickets: <%= userBooking.num_tickets %></p>
+                            <p class="mb-1">Total: $<%= userBooking.total_price.toFixed(2) %></p>
+                            <p class="mb-1">Status: <%= userBooking.status %></p>
+                            
+                            <% if (userBooking.status !== 'canceled') { %>
+                                <form action="/bookings/<%= userBooking.booking_id %>/cancel" method="POST" class="mt-2">
+                                    <button type="submit" class="btn btn-sm btn-danger">Cancel Booking</button>
+                                </form>
+                            <% } %>
+                        </div>
+                    <% } else if (event.status !== 'upcoming' && event.status !== 'ongoing') { %>
+                        <div class="alert alert-warning">
+                            This event is not available for booking.
+                        </div>
+                    <% } else if (availableTickets <= 0) { %>
+                        <div class="alert alert-danger">
+                            This event is sold out.
+                        </div>
+                    <% } else { %>
+                        <form action="/bookings/create" method="POST">
+                            <input type="hidden" name="event_id" value="<%= event.event_id %>">
+                            <div class="mb-3">
+                                <label for="num_tickets" class="form-label">Number of Tickets</label>
+                                <input type="number" class="form-control" id="num_tickets" name="num_tickets" min="1" max="<%= availableTickets %>" value="1" required>
+                                <div class="form-text">
+                                    Price per ticket: $<span id="price_per_ticket" data-price="<%= event.price %>"><%= event.price.toFixed(2) %></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Total Price</label>
+                                <div class="h4 text-primary">$<span id="total_price"><%= event.price.toFixed(2) %></span></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Book Now</button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Event Details Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Event Details</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="far fa-calendar-alt me-2"></i> 
+                        <%= new Date(event.event_date).toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric'
+                        }) %>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="far fa-clock me-2"></i>
+                        <%= new Date(event.event_date).toLocaleTimeString('en-US', { 
+                            hour: '2-digit', 
+                            minute: '2-digit'
+                        }) %>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-map-marker-alt me-2"></i> <%= event.location %>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-user me-2"></i> Organized by <%= event.organizer_name %>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-ticket-alt me-2"></i> 
+                        <% if (availableTickets > 0) { %>
+                            <%= availableTickets %> tickets available
+                        <% } else { %>
+                            Sold Out
+                        <% } %>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
