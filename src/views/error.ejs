@@ -1,0 +1,17 @@
+<!-- Error Page -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-5 text-center">
+                    <h1 class="text-danger mb-4">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </h1>
+                    <h2 class="card-title mb-4"><%= title || 'Error' %></h2>
+                    <p class="card-text lead mb-4"><%= message || 'An unexpected error occurred.' %></p>
+                    <a href="/" class="btn btn-primary">Return to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

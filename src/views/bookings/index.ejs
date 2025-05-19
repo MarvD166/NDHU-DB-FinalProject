@@ -1,0 +1,68 @@
+<!-- My Bookings Page -->
+<div class="container">
+    <h1 class="mb-4">My Bookings</h1>
+    
+    <% if (bookings && bookings.length > 0) { %>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Tickets</th>
+                        <th>Total Price</th>
+                        <th>Booking Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% bookings.forEach(booking => { %>
+                        <tr>
+                            <td>
+                                <a href="/events/<%= booking.event_id %>"><%= booking.title %></a>
+                            </td>
+                            <td>
+                                <%= new Date(booking.event_date).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric'
+                                }) %>
+                            </td>
+                            <td><%= booking.num_tickets %></td>
+                            <td>$<%= booking.total_price.toFixed(2) %></td>
+                            <td>
+                                <%= new Date(booking.booking_date).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric'
+                                }) %>
+                            </td>
+                            <td>
+                                <% if (booking.status === 'confirmed') { %>
+                                    <span class="badge bg-success">Confirmed</span>
+                                <% } else if (booking.status === 'pending') { %>
+                                    <span class="badge bg-warning">Pending</span>
+                                <% } else if (booking.status === 'canceled') { %>
+                                    <span class="badge bg-danger">Canceled</span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (booking.status !== 'canceled') { %>
+                                    <form action="/bookings/<%= booking.booking_id %>/cancel" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                                    </form>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <div class="alert alert-info">
+            <p>You don't have any bookings yet.</p>
+            <a href="/events" class="btn btn-primary mt-2">Browse Events</a>
+        </div>
+    <% } %>
+</div>
