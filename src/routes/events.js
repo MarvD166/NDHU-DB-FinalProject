@@ -162,6 +162,7 @@ router.get('/:id', async (req, res) => {
     
     const bookedTickets = bookingResult[0].booked_tickets || 0;
     const availableTickets = event.capacity - bookedTickets;
+
     
     res.render('events/show', { 
       title: event.title, 
