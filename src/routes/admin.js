@@ -1,18 +1,23 @@
 const express = require('express');
-const { pool } = require('../config/db');
-
 const router = express.Router();
+const { pool } = require('../config/db');
 
 // Middleware to check if user is admin
 const isAdmin = (req, res, next) => {
   if (req.session.user && req.session.user.isAdmin) {
-    return next();
+    next();
+  } else {
+    res.status(403).render('error', { 
+      title: 'Access Denied', 
+      message: 'You do not have permission to access this page' 
+    });
   }
-  res.status(403).render('error', { 
-    title: 'Access Denied', 
-    message: 'You do not have permission to access this area' 
-  });
 };
+
+// Root admin route - redirect to dashboard
+router.get('/', isAdmin, (req, res) => {
+  res.redirect('/admin/dashboard');
+});
 
 // Admin dashboard
 router.get('/dashboard', isAdmin, async (req, res) => {
@@ -64,21 +69,15 @@ router.get('/dashboard', isAdmin, async (req, res) => {
   }
 });
 
-
-// Manage users
+// User management
 router.get('/users', isAdmin, async (req, res) => {
   try {
-    const [users] = await pool.query(`
-      SELECT u.*, 
-      (SELECT COUNT(*) FROM events WHERE organizer_id = u.user_id) as event_count,
-      (SELECT COUNT(*) FROM bookings WHERE user_id = u.user_id) as booking_count
-      FROM users u
-      ORDER BY u.created_at DESC
-    `);
+    const [users] = await pool.query('SELECT * FROM users');
     
     res.render('admin/users', { 
-      title: 'Manage Users',
-      users
+      title: 'User Management',
+      users,
+      currentUser: req.session.user
     });
   } catch (error) {
     console.error('Error loading users:', error);
@@ -94,26 +93,20 @@ router.post('/users/:id/toggle-admin', isAdmin, async (req, res) => {
   const userId = req.params.id;
   
   try {
-    // Get current status
-    const [users] = await pool.query(
-      'SELECT is_admin FROM users WHERE user_id = ?',
-      [userId]
-    );
+    // Get current admin status
+    const [userResult] = await pool.query('SELECT is_admin FROM users WHERE user_id = ?', [userId]);
     
-    if (users.length === 0) {
+    if (userResult.length === 0) {
       return res.status(404).render('error', { 
         title: 'Error', 
         message: 'User not found' 
       });
     }
     
-    const currentStatus = users[0].is_admin;
+    const newStatus = userResult[0].is_admin ? 0 : 1;
     
-    // Toggle status
-    await pool.query(
-      'UPDATE users SET is_admin = ? WHERE user_id = ?',
-      [currentStatus ? 0 : 1, userId]
-    );
+    // Update admin status
+    await pool.query('UPDATE users SET is_admin = ? WHERE user_id = ?', [newStatus, userId]);
     
     res.redirect('/admin/users');
   } catch (error) {
@@ -125,19 +118,18 @@ router.post('/users/:id/toggle-admin', isAdmin, async (req, res) => {
   }
 });
 
-// Manage events
+// Event management
 router.get('/events', isAdmin, async (req, res) => {
   try {
     const [events] = await pool.query(`
-      SELECT e.*, u.username as organizer_name,
-      (SELECT COUNT(*) FROM bookings WHERE event_id = e.event_id) as booking_count
+      SELECT e.*, u.username as organizer_name
       FROM events e
       JOIN users u ON e.organizer_id = u.user_id
-      ORDER BY e.created_at DESC
+      ORDER BY e.event_date DESC
     `);
     
     res.render('admin/events', { 
-      title: 'Manage Events',
+      title: 'Event Management',
       events
     });
   } catch (error) {
@@ -150,15 +142,12 @@ router.get('/events', isAdmin, async (req, res) => {
 });
 
 // Update event status
-router.post('/events/:id/status', isAdmin, async (req, res) => {
+router.post('/events/:id/toggle-status', isAdmin, async (req, res) => {
   const eventId = req.params.id;
   const { status } = req.body;
   
   try {
-    await pool.query(
-      'UPDATE events SET status = ? WHERE event_id = ?',
-      [status, eventId]
-    );
+    await pool.query('UPDATE events SET status = ? WHERE event_id = ?', [status, eventId]);
     
     res.redirect('/admin/events');
   } catch (error) {
@@ -170,7 +159,7 @@ router.post('/events/:id/status', isAdmin, async (req, res) => {
   }
 });
 
-// Manage bookings
+// Booking management
 router.get('/bookings', isAdmin, async (req, res) => {
   try {
     const [bookings] = await pool.query(`
@@ -182,7 +171,7 @@ router.get('/bookings', isAdmin, async (req, res) => {
     `);
     
     res.render('admin/bookings', { 
-      title: 'Manage Bookings',
+      title: 'Booking Management',
       bookings
     });
   } catch (error) {
@@ -195,15 +184,12 @@ router.get('/bookings', isAdmin, async (req, res) => {
 });
 
 // Update booking status
-router.post('/bookings/:id/status', isAdmin, async (req, res) => {
+router.post('/bookings/:id/update-status', isAdmin, async (req, res) => {
   const bookingId = req.params.id;
   const { status } = req.body;
   
   try {
-    await pool.query(
-      'UPDATE bookings SET status = ? WHERE booking_id = ?',
-      [status, bookingId]
-    );
+    await pool.query('UPDATE bookings SET status = ? WHERE booking_id = ?', [status, bookingId]);
     
     res.redirect('/admin/bookings');
   } catch (error) {
@@ -215,20 +201,21 @@ router.post('/bookings/:id/status', isAdmin, async (req, res) => {
   }
 });
 
-// Manage categories
+// Category management
 router.get('/categories', isAdmin, async (req, res) => {
   try {
+    // Get categories with event counts
     const [categories] = await pool.query(`
-      SELECT c.*, 
-      (SELECT COUNT(*) FROM event_category_mapping WHERE category_id = c.category_id) as event_count
+      SELECT c.*, COUNT(ecm.event_id) as event_count
       FROM event_categories c
+      LEFT JOIN event_category_mapping ecm ON c.category_id = ecm.category_id
+      GROUP BY c.category_id
       ORDER BY c.name
     `);
     
     res.render('admin/categories', { 
-      title: 'Manage Categories',
-      categories,
-      error: null
+      title: 'Category Management',
+      categories
     });
   } catch (error) {
     console.error('Error loading categories:', error);
@@ -239,59 +226,19 @@ router.get('/categories', isAdmin, async (req, res) => {
   }
 });
 
-// Add category
-router.post('/categories', isAdmin, async (req, res) => {
-  const { name, description } = req.body;
+// Create category
+router.post('/categories/create', isAdmin, async (req, res) => {
+  const { name } = req.body;
   
   try {
-    await pool.query(
-      'INSERT INTO event_categories (name, description) VALUES (?, ?)',
-      [name, description]
-    );
+    await pool.query('INSERT INTO event_categories (name) VALUES (?)', [name]);
     
     res.redirect('/admin/categories');
   } catch (error) {
-    console.error('Error adding category:', error);
-    
-    try {
-      const [categories] = await pool.query(`
-        SELECT c.*, 
-        (SELECT COUNT(*) FROM event_category_mapping WHERE category_id = c.category_id) as event_count
-        FROM event_categories c
-        ORDER BY c.name
-      `);
-      
-      res.render('admin/categories', { 
-        title: 'Manage Categories',
-        categories,
-        error: 'Failed to add category'
-      });
-    } catch (renderError) {
-      res.status(500).render('error', { 
-        title: 'Error', 
-        message: 'Failed to add category' 
-      });
-    }
-  }
-});
-
-// Edit category
-router.post('/categories/:id', isAdmin, async (req, res) => {
-  const categoryId = req.params.id;
-  const { name, description } = req.body;
-  
-  try {
-    await pool.query(
-      'UPDATE event_categories SET name = ?, description = ? WHERE category_id = ?',
-      [name, description, categoryId]
-    );
-    
-    res.redirect('/admin/categories');
-  } catch (error) {
-    console.error('Error updating category:', error);
+    console.error('Error creating category:', error);
     res.status(500).render('error', { 
       title: 'Error', 
-      message: 'Failed to update category' 
+      message: 'Failed to create category' 
     });
   }
 });
@@ -301,51 +248,14 @@ router.post('/categories/:id/delete', isAdmin, async (req, res) => {
   const categoryId = req.params.id;
   
   try {
-    await pool.query(
-      'DELETE FROM event_categories WHERE category_id = ?',
-      [categoryId]
-    );
+    await pool.query('DELETE FROM event_categories WHERE category_id = ?', [categoryId]);
     
     res.redirect('/admin/categories');
   } catch (error) {
     console.error('Error deleting category:', error);
     res.status(500).render('error', { 
       title: 'Error', 
-      message: 'Failed to delete category. It may be in use by events.' 
-    });
-  }
-});
-
-// Database management
-router.get('/database', isAdmin, async (req, res) => {
-  try {
-    // Get table statistics
-    const [tables] = await pool.query(`
-      SELECT 
-        table_name, 
-        table_rows,
-        data_length,
-        index_length,
-        create_time,
-        update_time
-      FROM 
-        information_schema.tables
-      WHERE 
-        table_schema = 'event_management_system'
-      ORDER BY 
-        table_name
-    `);
-    
-    res.render('admin/database', { 
-      title: 'Database Management',
-      tables,
-      message: null
-    });
-  } catch (error) {
-    console.error('Error loading database info:', error);
-    res.status(500).render('error', { 
-      title: 'Error', 
-      message: 'Failed to load database information' 
+      message: 'Failed to delete category' 
     });
   }
 });
