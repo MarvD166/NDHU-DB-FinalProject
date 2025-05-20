@@ -1,0 +1,87 @@
+<!-- Admin Bookings Management -->
+<div class="container">
+    <h1 class="mb-4">Booking Management</h1>
+    
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form action="/admin/bookings/search" method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="query" placeholder="Search bookings..." value="<%= locals.searchQuery || '' %>">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="confirmed" <%= locals.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                        <option value="pending" <%= locals.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="canceled" <%= locals.status === 'canceled' ? 'selected' : '' %>>Canceled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Bookings Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Bookings</h5>
+        </div>
+        <div class="card-body">
+            <% if (bookings && bookings.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Event</th>
+                                <th>Tickets</th>
+                                <th>Total</th>
+                                <th>Booking Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% bookings.forEach(booking => { %>
+                                <tr>
+                                    <td><%= booking.booking_id %></td>
+                                    <td><%= booking.username %></td>
+                                    <td><%= booking.event_title %></td>
+                                    <td><%= booking.num_tickets %></td>
+                                    <td>$<%= parseFloat(booking.total_price).toFixed(2) %></td>
+                                    <td><%= new Date(booking.booking_date).toLocaleDateString() %></td>
+                                    <td>
+                                        <span class="badge bg-<%= 
+                                            booking.status === 'confirmed' ? 'success' : 
+                                            (booking.status === 'pending' ? 'warning' : 'danger') 
+                                        %>">
+                                            <%= booking.status %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="/admin/bookings/<%= booking.booking_id %>" class="btn btn-info">View</a>
+                                            <form action="/admin/bookings/<%= booking.booking_id %>/update-status" method="POST" class="d-inline">
+                                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                    <option value="confirmed" <%= booking.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                                                    <option value="pending" <%= booking.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                                    <option value="canceled" <%= booking.status === 'canceled' ? 'selected' : '' %>>Canceled</option>
+                                                </select>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <p class="text-muted">No bookings found.</p>
+            <% } %>
+        </div>
+    </div>
+</div>

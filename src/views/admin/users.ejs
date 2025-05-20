@@ -1,0 +1,78 @@
+<!-- Admin Users Management -->
+<div class="container">
+    <h1 class="mb-4">User Management</h1>
+    
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form action="/admin/users/search" method="GET" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="query" placeholder="Search users..." value="<%= locals.searchQuery || '' %>">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Users</h5>
+            <a href="/admin/users/new" class="btn btn-sm btn-primary">Add User</a>
+        </div>
+        <div class="card-body">
+            <% if (users && users.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Registered</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr>
+                                    <td><%= user.user_id %></td>
+                                    <td><%= user.username %></td>
+                                    <td><%= user.email %></td>
+                                    <td><%= user.first_name %> <%= user.last_name %></td>
+                                    <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+                                    <td>
+                                        <% if (user.is_admin) { %>
+                                            <span class="badge bg-danger">Admin</span>
+                                        <% } else { %>
+                                            <span class="badge bg-secondary">User</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="/admin/users/<%= user.user_id %>" class="btn btn-info">View</a>
+                                            <a href="/admin/users/<%= user.user_id %>/edit" class="btn btn-warning">Edit</a>
+                                            <% if (typeof currentUser !== 'undefined' && user.user_id !== currentUser.id) { %>
+                                                <form action="/admin/users/<%= user.user_id %>/toggle-admin" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-<%= user.is_admin ? 'secondary' : 'danger' %>">
+                                                        <%= user.is_admin ? 'Remove Admin' : 'Make Admin' %>
+                                                    </button>
+                                                </form>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <p class="text-muted">No users found.</p>
+            <% } %>
+        </div>
+    </div>
+</div>

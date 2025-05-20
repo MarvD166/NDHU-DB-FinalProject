@@ -1,0 +1,178 @@
+<!-- Admin Dashboard -->
+<div class="container">
+    <h1 class="mb-4">Admin Dashboard</h1>
+    
+    <!-- System Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Users</h5>
+                    <p class="card-text display-4"><%= typeof stats !== 'undefined' && stats.userCount ? stats.userCount : 0 %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Events</h5>
+                    <p class="card-text display-4"><%= typeof stats !== 'undefined' && stats.eventCount ? stats.eventCount : 0 %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Bookings</h5>
+                    <p class="card-text display-4"><%= typeof stats !== 'undefined' && stats.bookingCount ? stats.bookingCount : 0 %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Categories</h5>
+                    <p class="card-text display-4"><%= typeof stats !== 'undefined' && stats.categoryCount ? stats.categoryCount : 0 %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admin Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Admin Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/users" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-users"></i> Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/events" class="btn btn-outline-success w-100">
+                                <i class="fas fa-calendar-alt"></i> Manage Events
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/bookings" class="btn btn-outline-info w-100">
+                                <i class="fas fa-ticket-alt"></i> Manage Bookings
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/categories" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-tags"></i> Manage Categories
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Events -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Events</h5>
+                    <a href="/admin/events" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <% if (recentEvents && recentEvents.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th>Location</th>
+                                        <th>Organizer</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% recentEvents.forEach(event => { %>
+                                        <tr>
+                                            <td><%= event.title %></td>
+                                            <td><%= new Date(event.event_date).toLocaleDateString() %></td>
+                                            <td><%= event.location %></td>
+                                            <td><%= event.organizer_name %></td>
+                                            <td>
+                                                <span class="badge bg-<%= event.status === 'upcoming' ? 'primary' : (event.status === 'ongoing' ? 'success' : 'secondary') %>">
+                                                    <%= event.status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="/events/<%= event.event_id %>" class="btn btn-sm btn-info">View</a>
+                                                <a href="/admin/events/<%= event.event_id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">No events found.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Bookings -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                    <a href="/admin/bookings" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <% if (recentBookings && recentBookings.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Event</th>
+                                        <th>Tickets</th>
+                                        <th>Total</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% recentBookings.forEach(booking => { %>
+                                        <tr>
+                                            <td><%= booking.username %></td>
+                                            <td><%= booking.event_title %></td>
+                                            <td><%= booking.num_tickets %></td>
+                                            <td>$<%= parseFloat(booking.total_price).toFixed(2) %></td>
+                                            <td><%= new Date(booking.booking_date).toLocaleDateString() %></td>
+                                            <td>
+                                                <span class="badge bg-<%= booking.status === 'confirmed' ? 'success' : (booking.status === 'pending' ? 'warning' : 'danger') %>">
+                                                    <%= booking.status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="/admin/bookings/<%= booking.booking_id %>" class="btn btn-sm btn-info">View</a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">No bookings found.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

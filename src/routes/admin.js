@@ -15,13 +15,20 @@ const isAdmin = (req, res, next) => {
 };
 
 // Admin dashboard
-router.get('/', isAdmin, async (req, res) => {
+router.get('/dashboard', isAdmin, async (req, res) => {
   try {
     // Get counts for dashboard
     const [userCount] = await pool.query('SELECT COUNT(*) as count FROM users');
     const [eventCount] = await pool.query('SELECT COUNT(*) as count FROM events');
     const [bookingCount] = await pool.query('SELECT COUNT(*) as count FROM bookings');
-    const [reviewCount] = await pool.query('SELECT COUNT(*) as count FROM reviews');
+    const [categoryCount] = await pool.query('SELECT COUNT(*) as count FROM event_categories');
+
+    const stats = {
+      userCount: userCount[0].count,
+      eventCount: eventCount[0].count,
+      bookingCount: bookingCount[0].count,
+      categoryCount: categoryCount[0].count
+    };
     
     // Get recent events
     const [recentEvents] = await pool.query(`
@@ -44,12 +51,7 @@ router.get('/', isAdmin, async (req, res) => {
     
     res.render('admin/dashboard', { 
       title: 'Admin Dashboard',
-      counts: {
-        users: userCount[0].count,
-        events: eventCount[0].count,
-        bookings: bookingCount[0].count,
-        reviews: reviewCount[0].count
-      },
+      stats,
       recentEvents,
       recentBookings
     });
@@ -61,6 +63,7 @@ router.get('/', isAdmin, async (req, res) => {
     });
   }
 });
+
 
 // Manage users
 router.get('/users', isAdmin, async (req, res) => {

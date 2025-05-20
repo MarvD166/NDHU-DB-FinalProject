@@ -25,7 +25,7 @@
             </p>
         </div>
         <div class="col-md-4 text-md-end">
-            <p class="h3 text-primary mb-2">$<%= (event.price || 0).toFixed(2) %></p>
+            <p class="h3 text-primary mb-2">$<%= (Number(event.price) || 0).toFixed(2) %></p>
             <p class="mb-0">
                 <% if (availableTickets > 0) { %>
                     <span class="text-success"><%= availableTickets %> tickets available</span>
@@ -134,7 +134,7 @@
                         <div class="alert alert-success">
                             <h6>You've booked this event!</h6>
                             <p class="mb-1">Tickets: <%= userBooking.num_tickets %></p>
-                            <p class="mb-1">Total: $<%= userBooking.total_price.toFixed(2) %></p>
+                            <p class="mb-1">Total: $<%= (Number(userBooking.total_price) || 0).toFixed(2) %></p>
                             <p class="mb-1">Status: <%= userBooking.status %></p>
                             
                             <% if (userBooking.status !== 'canceled') { %>
@@ -158,12 +158,12 @@
                                 <label for="num_tickets" class="form-label">Number of Tickets</label>
                                 <input type="number" class="form-control" id="num_tickets" name="num_tickets" min="1" max="<%= availableTickets %>" value="1" required>
                                 <div class="form-text">
-                                    Price per ticket: $<span id="price_per_ticket" data-price="<%= event.price %>"><%= event.price.toFixed(2) %></span>
+                                    Price per ticket: $<span id="price_per_ticket" data-price="<%= event.price %>"><%= Number(event.price).toFixed(2) %></span>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Total Price</label>
-                                <div class="h4 text-primary">$<span id="total_price"><%= event.price.toFixed(2) %></span></div>
+                                <div class="h4 text-primary">$<span id="total_price"><%= Number(event.price).toFixed(2) %></span></div>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Book Now</button>
                         </form>
