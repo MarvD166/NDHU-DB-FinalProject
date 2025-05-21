@@ -1,5 +1,3 @@
-console.log('✅ events.js geladen!');
-
 const express = require('express');
 const { pool } = require('../config/db');
 
@@ -99,7 +97,6 @@ router.get('/search', async (req, res) => {
 
 // Create event form
 router.get('/new', isAuthenticated, async (req, res) => {
-  console.log('🎯 GET /events/new erreicht');
   try {
     const [categories] = await pool.query('SELECT * FROM event_categories');
     
@@ -123,27 +120,36 @@ router.post('/', isAuthenticated, async (req, res) => {
     title, description, event_date, location, 
     capacity, price, categories 
   } = req.body;
-  
+
   try {
+    // Start transaction
     const connection = await pool.getConnection();
     await connection.beginTransaction();
-    
+
     try {
+      // Insert event
       const [eventResult] = await connection.query(`
         INSERT INTO events (
           title, description, event_date, location, 
-          capacity, price, organizer_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          capacity, price, organizer_id, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `, [
-        title, description, event_date, location, 
-        capacity, price, req.session.user.id
+        title,
+        description,
+        event_date,
+        location,
+        capacity,
+        price,
+        req.session.user.id,   // ✅ Korrigiert hier!
+        'upcoming'             // ✅ Status hinzugefügt
       ]);
-      
+
       const eventId = eventResult.insertId;
-      
+
+      // Insert category mappings
       if (categories && categories.length > 0) {
         const categoryIds = Array.isArray(categories) ? categories : [categories];
-        
+
         for (const categoryId of categoryIds) {
           await connection.query(`
             INSERT INTO event_category_mapping (event_id, category_id)
@@ -151,10 +157,10 @@ router.post('/', isAuthenticated, async (req, res) => {
           `, [eventId, categoryId]);
         }
       }
-      
+
       await connection.commit();
       connection.release();
-      
+
       res.redirect(`/events/${eventId}`);
     } catch (error) {
       await connection.rollback();
@@ -163,14 +169,14 @@ router.post('/', isAuthenticated, async (req, res) => {
     }
   } catch (error) {
     console.error('Error creating event:', error);
-    
+
     try {
       const [categories] = await pool.query('SELECT * FROM event_categories');
-      
+
       res.render('events/new', { 
         title: 'Create Event', 
         categories,
-        error: 'Failed to create event',
+        error: 'Failed to create event: ' + error.message,
         formData: req.body
       });
     } catch (renderError) {
@@ -181,6 +187,7 @@ router.post('/', isAuthenticated, async (req, res) => {
     }
   }
 });
+
 
 // Edit event form
 router.get('/:id/edit', isAuthenticated, async (req, res) => {
