@@ -8,7 +8,6 @@ const { testConnection } = require('./config/db');
 // Import routes
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
-console.log('🔍 Router:', eventRoutes.stack?.map(r => r.route?.path));
 const bookingRoutes = require('./routes/bookings');
 const adminRoutes = require('./routes/admin');
 
