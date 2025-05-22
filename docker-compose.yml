@@ -27,3 +27,5 @@ services:
       DB_PASS: root
       DB_NAME: event_management_system
       SESSION_SECRET: mysecret
+    volumes:
+      - .:/app
