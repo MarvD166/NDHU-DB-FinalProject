@@ -1,120 +1,97 @@
 const express = require('express');
+const router = express.Router();
 const bcrypt = require('bcrypt');
 const { pool } = require('../config/db');
 
-const router = express.Router();
-
-// Login page
+// Show login form
 router.get('/login', (req, res) => {
-  res.render('auth/login', { title: 'Login', error: null });
+  res.render('auth/login', { error: null });
 });
 
-// Register page
+// Show register form
 router.get('/register', (req, res) => {
-  res.render('auth/register', { title: 'Register', error: null });
+  res.render('auth/register', { error: null, title: 'Register' });
 });
 
-// Process registration
+
+// Handle login
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  console.log('Login input:', username, password);
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+
+    if (rows.length === 0) {
+      console.log('❌ Kein Benutzer gefunden');
+      return res.render('auth/login', { error: 'Invalid username or password' });
+    }
+
+    const user = rows[0];
+    console.log('🔍 Benutzer aus DB:', user);
+
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    console.log('✅ Passwortvergleich:', passwordMatch);
+
+    if (!passwordMatch) {
+      return res.render('auth/login', { error: 'Invalid username or password' });
+    }
+
+    req.session.user = {
+      id: user.user_id,
+      username: user.username,
+      isAdmin: user.is_admin
+    };
+
+    res.redirect('/');
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).render('auth/login', { error: 'Internal server error' });
+  }
+});
+
 router.post('/register', async (req, res) => {
   const { username, email, password, firstName, lastName } = req.body;
-  
+
   try {
-    // Check if user already exists
+    // Existiert der Benutzer bereits?
     const [existingUsers] = await pool.query(
       'SELECT * FROM users WHERE username = ? OR email = ?',
       [username, email]
     );
-    
+
     if (existingUsers.length > 0) {
       return res.render('auth/register', {
-        title: 'Register',
-        error: 'Username or email already exists'
+        error: 'Username or email already exists',
+        title: 'Register'
       });
     }
-    
-    // Hash password
+
+    // Passwort hashen
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Insert new user
-    const [result] = await pool.query(
+
+    // Benutzer einfügen
+    await pool.query(
       'INSERT INTO users (username, email, password_hash, first_name, last_name) VALUES (?, ?, ?, ?, ?)',
       [username, email, hashedPassword, firstName, lastName]
     );
-    
-    // Auto login after registration
-    req.session.user = {
-      id: result.insertId,
-      username,
-      email,
-      firstName,
-      lastName,
-      isAdmin: 0
-    };
-    
-    res.redirect('/');
+
+    // Nach Registrierung zur Login-Seite
+    res.redirect('/auth/login');
   } catch (error) {
     console.error('Registration error:', error);
-    res.render('auth/register', {
-      title: 'Register',
-      error: 'An error occurred during registration'
+    res.status(500).render('auth/register', {
+      error: 'Internal server error',
+      title: 'Register'
     });
   }
 });
 
-// Process login
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  
-  try {
-    // Find user
-    const [users] = await pool.query(
-      'SELECT * FROM users WHERE username = ?',
-      [username]
-    );
-    
-    if (users.length === 0) {
-      return res.render('auth/login', {
-        title: 'Login',
-        error: 'Invalid username or password'
-      });
-    }
-    
-    const user = users[0];
-    
-    // Check password
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-    
-    if (!passwordMatch) {
-      return res.render('auth/login', {
-        title: 'Login',
-        error: 'Invalid username or password'
-      });
-    }
-    
-    // Set session
-    req.session.user = {
-      id: user.user_id,
-      username: user.username,
-      email: user.email,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      isAdmin: user.is_admin
-    };
-    
-    res.redirect('/');
-  } catch (error) {
-    console.error('Login error:', error);
-    res.render('auth/login', {
-      title: 'Login',
-      error: 'An error occurred during login'
-    });
-  }
-});
-
-// Logout
+// Handle logout
 router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
+  req.session.destroy(() => {
+    res.redirect('/auth/login');
+  });
 });
 
 module.exports = router;

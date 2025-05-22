@@ -22,6 +22,11 @@ CREATE TABLE users (
     is_admin BOOLEAN DEFAULT FALSE
 );
 
+-- Insert admin and user accounts with pre-hashed passwords
+INSERT INTO users (username, email, password_hash, first_name, last_name, is_admin) VALUES
+('admin', 'admin@example.com', '$2b$10$sWJ/1WQN44tjfU1e11R2f.BGq0FL4NRADFUKHW1S/8ob4vQ1/Ke.2', 'Admin', 'User', TRUE),
+('user', 'user@example.com', '$2b$10$XwiMcHvDmoOlwjfNFuxXMu8Yuk.P7txJ5aGbQXZaoI5/Xga2fi8tO', 'Normal', 'User', FALSE);
+
 -- EVENTS table
 CREATE TABLE events (
     event_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -88,10 +93,6 @@ INSERT INTO event_categories (name, description) VALUES
 ('Technology', 'Tech conferences, workshops, and meetups'),
 ('Business', 'Business conferences, networking events, and seminars'),
 ('Arts', 'Art exhibitions, theater performances, and cultural events');
-
--- Insert sample user
-INSERT INTO users (username, email, password_hash, first_name, last_name, is_admin) VALUES
-('admin', 'admin@example.com', '$2b$10$examplehashhereReplaceWithRealHash', 'Admin', 'User', TRUE);
 
 -- Insert sample events
 INSERT INTO events (title, description, event_date, location, capacity, price, organizer_id) VALUES
