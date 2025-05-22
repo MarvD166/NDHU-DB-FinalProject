@@ -1,3 +1,20 @@
-.env
+# Node
 node_modules/
-dist/
+npm-debug.log
+
+# Environment
+.env
+
+# Docker
+*.pid
+*.sock
+
+# Mac
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Optional
+.env.local
