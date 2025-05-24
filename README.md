@@ -68,11 +68,15 @@ docker-compose up --build
 ````
 📌 On first run, the MySQL database will be initialized using init.sql, and test users + sample events will be added automatically.
 
-4. **Access the application**
-- Frontend: http://localhost:3000
-- Admin login:
-Username: admin
-Password: admin123
-User login:
-Username: user
-Password: user123
+4. **Access the Application**
+
+- 🌐 Open in browser: [http://localhost:3000](http://localhost:3000)
+
+#### 🔐 Admin Login
+- **Username**: `admin`  
+- **Password**: `admin123`
+
+#### 👤 User Login
+- **Username**: `user`  
+- **Password**: `user123`
+
