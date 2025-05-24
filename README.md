@@ -1,58 +1,57 @@
-# NDHU-DB-FinalProject
+# NDHU-DB-FinalProject – Event Management System
 
-A local web-based application for managing events, user registrations, bookings, and reviews. Designed as a complete solution covering the full database application lifecycle—from ER modeling to deployment.
+A containerized full-stack web application for managing events, user registrations, bookings, and reviews. Built as a final project to demonstrate database modeling, web development, and deployment using modern technologies and Docker.
 
-## Features
-	•	User registration, login, and session handling
-	•	Event creation, browsing, editing, and deletion
-	•	Ticket booking with confirmation and cancellation
-	•	Search and filter events by category
-	•	Event reviews and ratings
-	•	Admin dashboard for managing users, events, bookings, and categories
+---
 
-## Tech Stack
-	•	Backend: Node.js, Express.js
-	•	Frontend: HTML, CSS, JavaScript, Bootstrap, EJS
-	•	Database: MySQL 8.0
-	•	Authentication: bcrypt, express-session
-	•	Architecture: MVC pattern
+## 📦 Features
 
-## Database Design
-	•	Normalized to 3NF
-	•	ER Diagram: Includes USERS, EVENTS, BOOKINGS, REVIEWS, EVENT_CATEGORIES, EVENT_CATEGORY_MAPPING
-	•	Relationships:
-	•	Users ↔ Events: 1:N (organizer)
-	•	Users ↔ Bookings: 1:N
-	•	Users ↔ Reviews: 1:N
-	•	Events ↔ Categories: M:N via EVENT_CATEGORY_MAPPING
-	•	Events ↔ Bookings, Reviews: 1:N
+- User registration, login, and session handling
+- Event creation, browsing, editing, and deletion
+- Ticket booking with confirmation and cancellation
+- Event search and filtering by category
+- Event reviews and ratings
+- Admin dashboard to manage users, events, bookings, and categories
 
-### Refer to the ER Diagram and Database Schema for technical details.
+---
 
-## Usage
-#### See the User Guide for detailed usage instructions:
-	•	Register/Login
-	•	Create & manage events
-	•	Book/cancel tickets
-	•	Write and read reviews
-	•	Use admin functions if authorized
+## 🛠 Tech Stack
 
-## Testing
+- **Backend**: Node.js, Express.js
+- **Frontend**: HTML, CSS, JavaScript, Bootstrap, EJS
+- **Database**: MySQL 8.0 (Dockerized)
+- **Authentication**: bcrypt, express-session
+- **Containerization**: Docker, Docker Compose
+- **Architecture**: MVC pattern
 
-#### Comprehensive tests for:
-	•	Authentication
-	•	CRUD operations
-	•	Search & filters
-	•	Admin controls
+---
 
-### See Testing Documentation for cases and results.
+## 🧱 Database Design
 
-## Development Process
+- Normalized to 3NF
+- **Tables**: USERS, EVENTS, BOOKINGS, REVIEWS, EVENT_CATEGORIES, EVENT_CATEGORY_MAPPING
+- **Relationships**:
+  - Users ↔ Events: 1:N (organizer)
+  - Users ↔ Bookings: 1:N
+  - Users ↔ Reviews: 1:N
+  - Events ↔ Categories: M:N via EVENT_CATEGORY_MAPPING
+  - Events ↔ Bookings, Reviews: 1:N
 
-#### Includes:
-	•	ER modeling
-	•	Relational schema design
-	•	Full-stack development
-	•	Testing and validation
+📎 Refer to the ER Diagram and `init.sql` for schema structure.
 
-### Details in Final Report.
+---
+
+## 🚀 Getting Started (with Docker)
+
+### 📋 Requirements
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [Git](https://git-scm.com/)
+
+### 🔧 Setup Instructions
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/MarvD166/NDHU-DB-FinalProject.git
+cd NDHU-DB-FinalProject
