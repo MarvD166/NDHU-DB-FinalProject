@@ -2,12 +2,12 @@
 
 ## 1. Introduction
 
-This report documents the design and development process of an Event Management System, created as a term project for a Database course. The system is a web-based application that allows users to register, create events, book tickets, search for events, and includes an administrative interface for database management.
+This report documents the design and development process of an Event Management System, created as a term project for a Database course. The system is a local web-based application that allows users to register, create events, book tickets, search for events, and includes an administrative interface for database management.
 
 ## 2. Project Requirements
 
 The project requirements specified:
-- An online database application
+- An online database application (local database as minimum)
 - Use of an open-source DBMS as backend
 - Browser-based user interface
 - User registration and password login

@@ -1,6 +1,6 @@
 # NDHU-DB-FinalProject
 
-A web-based application for managing events, user registrations, bookings, and reviews. Designed as a complete solution covering the full database application lifecycle—from ER modeling to deployment.
+A local web-based application for managing events, user registrations, bookings, and reviews. Designed as a complete solution covering the full database application lifecycle—from ER modeling to deployment.
 
 ## Features
 	•	User registration, login, and session handling

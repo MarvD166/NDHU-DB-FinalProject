@@ -22,7 +22,7 @@ CREATE TABLE users (
     is_admin BOOLEAN DEFAULT FALSE
 );
 
--- Insert admin and user accounts with pre-hashed passwords
+-- Insert users
 INSERT INTO users (username, email, password_hash, first_name, last_name, is_admin) VALUES
 ('admin', 'admin@example.com', '$2b$10$sWJ/1WQN44tjfU1e11R2f.BGq0FL4NRADFUKHW1S/8ob4vQ1/Ke.2', 'Admin', 'User', TRUE),
 ('user', 'user@example.com', '$2b$10$XwiMcHvDmoOlwjfNFuxXMu8Yuk.P7txJ5aGbQXZaoI5/Xga2fi8tO', 'Normal', 'User', FALSE);
@@ -95,14 +95,16 @@ INSERT INTO event_categories (name, description) VALUES
 ('Arts', 'Art exhibitions, theater performances, and cultural events');
 
 -- Insert sample events
-INSERT INTO events (title, description, event_date, location, capacity, price, organizer_id) VALUES
-('Tech Conference 2025', 'A major annual tech conference.', '2025-10-10 09:00:00', 'Berlin Convention Center', 200, 199.99, 1),
-('Music Fest', 'A weekend of live music and fun.', '2025-08-15 16:00:00', 'City Park', 500, 49.99, 1);
+INSERT INTO events (title, description, event_date, location, capacity, price, organizer_id, status) VALUES
+('Tech Conference 2025', 'A major annual tech conference.', '2025-10-10 09:00:00', 'Berlin Convention Center', 200, 199.99, 1, 'upcoming'),
+('Music Fest', 'A weekend of live music and fun.', '2025-08-15 16:00:00', 'City Park', 500, 49.99, 1, 'upcoming'),
+('Business Networking Event', 'Connect with professionals and expand your business network.', '2025-08-05 17:30:00', 'Grand Hotel, Chicago', 150, 49.99, 1, 'upcoming');
 
 -- Map categories to events
 INSERT INTO event_category_mapping (event_id, category_id) VALUES
 (1, 3),  -- Tech Conference -> Technology
-(2, 1);  -- Music Fest -> Music
+(2, 1),  -- Music Fest -> Music
+(3, 4);  -- Business Networking Event -> Business
 
 -- Insert sample booking
 INSERT INTO bookings (user_id, event_id, num_tickets, total_price, status) VALUES

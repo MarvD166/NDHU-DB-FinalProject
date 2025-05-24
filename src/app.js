@@ -3,7 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const { testConnection } = require('./config/db');
+const { pool, testConnection } = require('./config/db'); // <--- hier ergänzt!
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -21,7 +21,6 @@ app.set('views', path.join(__dirname, 'views'));
 const expressLayouts = require('express-ejs-layouts');
 app.use(expressLayouts);
 
-
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,10 +29,9 @@ app.use(session({
   secret: 'event_management_secret',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Set to true in production with HTTPS
+  cookie: { secure: false }
 }));
 
-// Custom middleware to make user data available to all templates
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
@@ -45,21 +43,37 @@ app.use('/events', eventRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/admin', adminRoutes);
 
-// Home route
-app.get('/', (req, res) => {
-  res.render('index', { title: 'Event Management System' });
+// ✅ Home route mit dynamischen Events
+app.get('/', async (req, res) => {
+  try {
+    const [featuredEvents] = await pool.query(`
+      SELECT * FROM events
+      ORDER BY event_date ASC
+      LIMIT 3
+    `);
+
+    res.render('index', {
+      title: 'Home',
+      featuredEvents
+    });
+  } catch (error) {
+    console.error('Error loading homepage:', error);
+    res.status(500).render('error', {
+      title: 'Error',
+      message: 'Failed to load featured events'
+    });
+  }
 });
 
-// Start server
+// Server starten
 async function startServer() {
   try {
-    // Test database connection
     const dbConnected = await testConnection();
     if (!dbConnected) {
       console.error('Failed to connect to database. Server will not start.');
       process.exit(1);
     }
-    
+
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
