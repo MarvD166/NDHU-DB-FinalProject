@@ -3,7 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const { pool, testConnection } = require('./config/db'); // <--- hier ergänzt!
+const { pool, testConnection } = require('./config/db');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -43,7 +43,7 @@ app.use('/events', eventRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/admin', adminRoutes);
 
-// ✅ Home route mit dynamischen Events
+//Home route with dynamic events
 app.get('/', async (req, res) => {
   try {
     const [featuredEvents] = await pool.query(`
@@ -65,7 +65,7 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Server starten
+// Start Server
 async function startServer() {
   try {
     const dbConnected = await testConnection();

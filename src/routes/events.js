@@ -140,8 +140,8 @@ router.post('/', isAuthenticated, async (req, res) => {
         location,
         capacity,
         price,
-        req.session.user.id,   // ✅ Korrigiert hier!
-        'upcoming'             // ✅ Status hinzugefügt
+        req.session.user.id,   
+        'upcoming'           
       ]);
 
       const eventId = eventResult.insertId;

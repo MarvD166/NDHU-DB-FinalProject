@@ -67,7 +67,7 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Passwort hashen
+    // Hashing password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Benutzer einfügen
@@ -76,7 +76,7 @@ router.post('/register', async (req, res) => {
       [username, email, hashedPassword, firstName, lastName]
     );
 
-    // Nach Registrierung zur Login-Seite
+    // After registration redirect to Login page
     res.redirect('/auth/login');
   } catch (error) {
     console.error('Registration error:', error);
