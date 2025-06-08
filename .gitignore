@@ -18,3 +18,4 @@ logs/
 
 # Optional
 .env.local
+todo.md
