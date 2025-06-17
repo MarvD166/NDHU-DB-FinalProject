@@ -41,7 +41,7 @@ The relationships between these entities were carefully designed to ensure data 
 
 ### 3.2 Database Schema Design
 
-After the ER diagram was approved, it was converted into a relational database schema. The schema design followed these principles:
+After the ER diagram was designed, it was converted into a relational database schema. The schema design followed these principles:
 
 - **Primary Keys**: Auto-incrementing integers for simplicity and performance
 - **Foreign Keys**: Used to enforce referential integrity with CASCADE options for automatic cleanup
@@ -131,18 +131,7 @@ The Event Management System successfully meets all the project requirements. It 
 
 The project demonstrates the entire process of database systems and applications design, from ER diagram to schema design to implementation and testing.
 
-## 8. Future Improvements
-
-While the current system meets all requirements, several improvements could be made in the future:
-
-- Implement email notifications for bookings and event updates
-- Add payment processing for ticket purchases
-- Enhance the search functionality with more advanced filters
-- Implement a recommendation system based on user preferences
-- Add social sharing features for events
-- Implement real-time updates using WebSockets
-
-## 9. References
+## 8. References
 
 - Node.js Documentation: https://nodejs.org/en/docs/
 - Express.js Documentation: https://expressjs.com/
