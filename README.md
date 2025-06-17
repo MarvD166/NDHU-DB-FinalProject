@@ -54,7 +54,7 @@ A containerized full-stack web application for managing events, user registratio
 
 ```bash
 git clone https://github.com/MarvD166/NDHU-DB-FinalProject.git
-cd NDHU-DB-FinalProject
+cd NDHU-DB-FinalProject/FinalProjectApplication
 ```
 
 2. **Rename the .env.example file to .env** 
